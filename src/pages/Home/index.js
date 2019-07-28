@@ -1,101 +1,58 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { MdAddShoppingCart } from 'react-icons/md';
+import { formatPrice } from '../../util/format';
+import api from '../../services/api';
 
 import { ProductList } from './styles';
 
-export default function Home() {
-  return (
-    <ProductList>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-asics-gel-nimbus-20-boston-feminino/58/D18-2423-058/D18-2423-058_zoom1.jpg"
-          alt="tênis"
-        />
-        <strong>Tênis Top</strong>
-        <span>R$129,90</span>
+class Home extends Component {
+  state = {
+    products: [],
+  };
 
-        <button>
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" /> 3
-          </div>
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-asics-gel-nimbus-20-boston-feminino/58/D18-2423-058/D18-2423-058_zoom1.jpg"
-          alt="tênis"
-        />
-        <strong>Tênis Top</strong>
-        <span>R$129,90</span>
+  async componentDidMount() {
+    const response = await api.get('products');
+    const data = response.data.map(product => ({
+      ...product,
+      priceFormatted: formatPrice(product.price),
+    }));
+    this.setState({ products: data });
+  }
 
-        <button>
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" /> 3
-          </div>
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-asics-gel-nimbus-20-boston-feminino/58/D18-2423-058/D18-2423-058_zoom1.jpg"
-          alt="tênis"
-        />
-        <strong>Tênis Top</strong>
-        <span>R$129,90</span>
+  handleAddProduct = product => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'ADD_TO_CART',
+      product,
+    });
+  };
 
-        <button>
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" /> 3
-          </div>
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-asics-gel-nimbus-20-boston-feminino/58/D18-2423-058/D18-2423-058_zoom1.jpg"
-          alt="tênis"
-        />
-        <strong>Tênis Top</strong>
-        <span>R$129,90</span>
+  render() {
+    const { products } = this.state;
 
-        <button>
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" /> 3
-          </div>
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-asics-gel-nimbus-20-boston-feminino/58/D18-2423-058/D18-2423-058_zoom1.jpg"
-          alt="tênis"
-        />
-        <strong>Tênis Top</strong>
-        <span>R$129,90</span>
+    return (
+      <ProductList>
+        {products.map(product => (
+          <li key={product.id}>
+            <img src={product.image} alt={product.title} />
+            <strong>{product.title}</strong>
+            <span>{product.priceFormatted}</span>
 
-        <button>
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" /> 3
-          </div>
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-asics-gel-nimbus-20-boston-feminino/58/D18-2423-058/D18-2423-058_zoom1.jpg"
-          alt="tênis"
-        />
-        <strong>Tênis Top</strong>
-        <span>R$129,90</span>
-
-        <button>
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" /> 3
-          </div>
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-    </ProductList>
-  );
+            <button
+              type="button"
+              onClick={() => this.handleAddProduct(product)}
+            >
+              <div>
+                <MdAddShoppingCart size={16} color="#FFF" /> 3
+              </div>
+              <span>ADICIONAR AO CARRINHO</span>
+            </button>
+          </li>
+        ))}
+      </ProductList>
+    );
+  }
 }
+
+export default connect()(Home);
